@@ -1,7 +1,17 @@
 <div align="center">
 <img src="images/logo.png" width="40%">
 
+[![made-with-Go][made-with-go-img]](http://golang.org)
+[![GitHub Release][release-img]][release]
+[![Go Report Card][go-report-img]][go-report]
+[![License: Apache-2.0][license-img]][license]
+
+![Maintainer-1][maintainer-1]
+![Maintainer-2][maintainer-2]
+
+
 # CNAPPgoat
+
 </div>
 
 CNAPPgoat is a multi-cloud, vulnerable-by-design environment deployment tool – specifically engineered to facilitate
@@ -12,8 +22,6 @@ detecting, and preventing such vulnerabilities.
 ![Gif demonstrating an example of using AccessUndenied](images/demo.gif)
 
 > **Warning**: CNAPPgoat deploys vulnerable environments. Only use it within safe, controlled sandboxes.
-
-With the cautionary note behind us, let's delve right in!
 
 ## Getting Started
 
@@ -31,9 +39,9 @@ and GCP.
     - [Azure CLI](https://docs.microsoft.com/cli/azure/install-azure-cli)
     - [Google Cloud SDK](https://cloud.google.com/sdk/docs/install)
 
-Additional dependencies will
-automatically install when you execute `go build` or `go run`. Pulumi dependencies will install on an on-demand basis
-when you provision your first environment, meaning the first-time provisioning might take a bit longer than subsequent
+Pulumi dependancies and plugins will install on-demand basis according to scenario's requirements
+when you provision your first environment. This means the first time provisioning might take a little longer than
+subsequent
 ones.
 
 ### Installation
@@ -42,9 +50,9 @@ Download the latest release from [here](https://github.com/ermetic-research/CNAP
 
     tar -xvf cnappgoat-<version>.tar.gz
     cd cnappgoat-<version>
-    cnappgoat list
+    ./cnappgoat list
 
-## External Scenarios
+## CNAPPgoat Scenarios
 
 CNAPPgoat downloads scenarios from the [cnappgoat-scenarios](https://github.com/ermetic-research/cnappgoat-scenarios)
 repository
@@ -53,21 +61,46 @@ these scenarios are automatically downloaded when you run CNAPPgoat and are stor
 directory.
 
 ### Usage
+```
+NAME:
+   cnappgoat - A multicloud open-source tool for deploying vulnerable-by-design cloud resources
 
-| Command     | Description                                                                                                          | Usage                                 |
-|-------------|----------------------------------------------------------------------------------------------------------------------|---------------------------------------|
-| `list`      | Lists all available scenarios for provisioning.                                                                      | `cnappgoat list`                      |
-| `describe`  | Provides detailed information about the specified scenario.                                                          | `cnappgoat describe <scenario name>`  |
-| `provision` | Provisions the scenario specified by the scenario name. To provision all scenarios, simply use `cnappgoat provision` | `cnappgoat provision <scenario name>` |
-| `destroy`   | Destroys the scenario specified by the scenario name. To destroy all scenarios, simply use `cnappgoat destroy`       | `cnappgoat destroy <scenario name>`   |
-| `clean`     | Cleans up all scenarios and deletes the `.cnappgoat` local directory                                                 | `cnappgoat clean `                    |   
-| `version`   | Displays the current version of CNAPPgoat                                                                            | `cnappgoat version`                   |
-| `help`      | Displays the help menu.                                                                                              | `cnappgoat help`                      |
+USAGE:
+   cnappgoat [global options] command [command options] [arguments...]
+
+VERSION:
+   0.1.0-beta, date: 2023-08-02T13:02:46Z, commit: 6bef61857d9f3cf88215269df8976f96317711dc
+
+
+COMMANDS:
+   clean      clean and remove all created resources and delete all scenarios and any related files
+   describe   describe a scenario
+   destroy    Destroy CNAPPgoat module scenarios
+   list       List CNAPPgoat module scenarios
+   provision  Provision CNAPPgoat module scenarios
+   help, h    Shows a list of commands or help for one command
+
+GLOBAL OPTIONS:
+   --debug        Enable debug mode (default: false)
+   --help, -h     show help
+   --version, -v  print the version
+```
+
+
+| Command           | Description                                                                                                          | Usage                                 |
+|-------------------|----------------------------------------------------------------------------------------------------------------------|---------------------------------------|
+| `list`            | Lists all available scenarios for provisioning.                                                                      | `cnappgoat list`                      |
+| `describe`        | Provides detailed information about the specified scenario.                                                          | `cnappgoat describe <scenario name>`  |
+| `provision`       | Provisions the scenario specified by the scenario name. To provision all scenarios, simply use `cnappgoat provision` | `cnappgoat provision <scenario name>` |
+| `destroy`         | Destroys the scenario specified by the scenario name. To destroy all scenarios, simply use `cnappgoat destroy`       | `cnappgoat destroy <scenario name>`   |
+| `clean`           | Cleans up all scenarios and deletes the `.cnappgoat` local directory                                                 | `cnappgoat clean `                    |   
+| `--version`, `-v` | Displays the current version of CNAPPgoat                                                                            | `cnappgoat --version`                 |
+| `--help`, `-h`    | Displays the help menu.                                                                                              | `cnappgoat --help`                    |
 
 You may use multiple arguments separated by spaces. For example:
 
 ```bash
-cnappgoat provision <scenario name> <scenario name> <scenario name>
+cnappgoat provision <scenario-1> <scenario-2> <scenario-N>
 ```
 
 #### Flags:
@@ -132,13 +165,17 @@ default credentials for each provider. Follow the steps below to set up your cre
 By setting these credentials, you will be able to deploy scenarios on AWS, Azure, and GCP using CNAPPgoat. If you're
 planning on using CNAPPgoat with a different provider, make sure to configure the credentials accordingly.
 
-## Other Recommended Projects
+## Acknowledgements
+Maintainers: @igalgofman, @noamsdahan 
+To email the project team, contact [research+cnappgoat@ermetic.com]
 
+### Similar projects
 CNAPPgoat provisions a breadth of vulnerable scenarios on multiple clouds to test detection and prevention capabilities.
 There are other great projects out there for vulnerable cloud environments that are focused on different areas, such as
-exploitation, detection, CTF (capture the flag) scenarios, etc. We recommend checking out the following projects:
+exploitation, detection, CTF (capture the flag) scenarios, etc. We were inspired by these tools and projects, and we
+recommend checking them out:
 
-* [Stratus Red Team by DataDog](https://github.com/DataDog/stratus-red-team): a tool that allows users , allowing to
+* [Stratus Red Team by DataDog](https://github.com/DataDog/stratus-red-team): a tool that allows users to
   emulate offensive attack techniques in a granular and self-contained manner
 * [Cloud Goat by Rhino Security Labs](https://github.com/RhinoSecurityLabs/cloudgoat): a "Vulnerable by Design" AWS
   deployment tool. It allows you to hone your cloud cybersecurity skills by creating and completing several "
@@ -155,4 +192,17 @@ sandbox.
 
 ## Disclaimer
 
-CNAPPgoat is provider "as is" and without any warranty or support.
+* CNAPPgoat is provider "as is" and without any warranty or support.
+* This is a beta version. The project is still in development, so we apologize for any growing pains.
+  We will release a stable version in the coming weeks.
+
+[license-img]:https://img.shields.io/badge/License-Apache%202.0-blue.svg
+[license]: https://github.com/ermetic-research/cnappgoat/blob/main/LICENSE
+[release]: https://github.com/ermetic-research/cnappgoat/releases
+[release-img]: https://img.shields.io/github/release/ermetic-research/cnappgoat.svg?logo=github
+[go-report]: https://goreportcard.com/report/github.com/ermetic-research/cnappgoat
+[go-report-img]: https://goreportcard.com/badge/github.com/ermetic-research/cnappgoat
+[made-with-go-img]: https://img.shields.io/badge/Made%20with-Go-1f425f.svg
+[maintainer-1]: https://img.shields.io/badge/maintainer-@noamsdahan-forestgreen
+[maintainer-2]: https://img.shields.io/badge/maintainer-@igalgofman-forestgreen
+
