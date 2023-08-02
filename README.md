@@ -1,5 +1,5 @@
 <div align="center">
-<img src="images/logo.png" width="25%">
+<img src="images/logo.png" width="40%">
 
 # CNAPPgoat
 </div>
