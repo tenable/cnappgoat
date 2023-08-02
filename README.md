@@ -1,10 +1,16 @@
-# CNAPPgoat
+<div align="center">
+<img src="images/logo.png" width="25%">
 
-CNAPPgoat is your multi-cloud, vulnerable-by-design environment deployment tool – specifically engineered to facilitate
+# CNAPPgoat
+</div>
+
+CNAPPgoat is a multi-cloud, vulnerable-by-design environment deployment tool – specifically engineered to facilitate
 practice arenas for defenders and pentesters. Its main function is to deploy intentionally
 vulnerable environments across multiple cloud service providers, to help you sharpen your skills in exploiting,
 detecting, and preventing such vulnerabilities.
-![Gif demonstrating an example of using AccessUndenied](demo.gif)
+
+![Gif demonstrating an example of using AccessUndenied](images/demo.gif)
+
 > **Warning**: CNAPPgoat deploys vulnerable environments. Only use it within safe, controlled sandboxes.
 
 With the cautionary note behind us, let's delve right in!
