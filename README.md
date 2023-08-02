@@ -6,8 +6,8 @@
 [![Go Report Card][go-report-img]][go-report]
 [![License: Apache-2.0][license-img]][license]
 
-![Maintainer-1][maintainer-1]
-![Maintainer-2][maintainer-2]
+[![Maintainer][maintainer-1]](mailto:research@ermetic.com)
+
 
 
 # CNAPPgoat
@@ -165,10 +165,11 @@ default credentials for each provider. Follow the steps below to set up your cre
 By setting these credentials, you will be able to deploy scenarios on AWS, Azure, and GCP using CNAPPgoat. If you're
 planning on using CNAPPgoat with a different provider, make sure to configure the credentials accordingly.
 
-## Acknowledgements
-Maintainers: @igalgofman, @noamsdahan 
-To email the project team, contact [research+cnappgoat@ermetic.com]
+## Learn more
+To learn more about CNAPPgoat, check out the post on the Ermetic blog:
+https://ermetic.com/blog/cloud/cnappgoat-multicloud-open-source-tool-for-deploying-vulnerable-by-design-cloud-resources/
 
+## Acknowledgements
 ### Similar projects
 CNAPPgoat provisions a breadth of vulnerable scenarios on multiple clouds to test detection and prevention capabilities.
 There are other great projects out there for vulnerable cloud environments that are focused on different areas, such as
@@ -190,6 +191,9 @@ the [Awesome Cloud Security Challeges](https://github.com/mikeprivette/awesome-s
 our list focused specifically on vulnerable-by-design cloud environments that are deployed by users in their own
 sandbox.
 
+## Contact
+To email the project team, contact [research+cnappgoat@ermetic.com](mailto:research+cnappgoat@ermetic.com)
+
 ## Disclaimer
 
 * CNAPPgoat is provider "as is" and without any warranty or support.
@@ -203,6 +207,5 @@ sandbox.
 [go-report]: https://goreportcard.com/report/github.com/ermetic-research/cnappgoat
 [go-report-img]: https://goreportcard.com/badge/github.com/ermetic-research/cnappgoat
 [made-with-go-img]: https://img.shields.io/badge/Made%20with-Go-1f425f.svg
-[maintainer-1]: https://img.shields.io/badge/maintainer-@noamsdahan-forestgreen
-[maintainer-2]: https://img.shields.io/badge/maintainer-@igalgofman-forestgreen
+[maintainer-1]: https://img.shields.io/badge/maintainer-Ermetic%20research%20team-purple
 
