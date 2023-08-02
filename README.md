@@ -1,5 +1,5 @@
 <div align="center">
-<img src="images/logo.png" width="40%">
+<img src="images/logo.png" width="40%" alt="CNAPPGoat logo: a smiling goat with a purple cloud background">
 
 [![made-with-Go][made-with-go-img]](http://golang.org)
 [![GitHub Release][release-img]][release]
