@@ -12,12 +12,13 @@ func GetScenarios(
 	args cli.Args,
 	reg *cnappgoat.Registry,
 	module string,
-	platform string) ([]*cnappgoat.Scenario, error) {
+	platform string,
+	state string) ([]*cnappgoat.Scenario, error) {
 	if scenarios := getScenarios(
 		args,
 		reg,
 		module,
-		platform); len(scenarios) > 0 {
+		platform, state); len(scenarios) > 0 {
 		return scenarios, nil
 	}
 
@@ -54,7 +55,8 @@ func getScenarios(
 	args cli.Args,
 	reg *cnappgoat.Registry,
 	module string,
-	platform string) (scenarios []*cnappgoat.Scenario) {
+	platform string,
+	state string) (scenarios []*cnappgoat.Scenario) {
 	if args.Len() > 0 {
 		for _, arg := range separateArgs(args.Slice()) {
 			scenario, ok := reg.GetScenario(arg)
@@ -75,33 +77,38 @@ func getScenarios(
 				continue
 			}
 
+			if state != "" &&
+				scenario.State.State != strings.ToUpper(state) {
+				logrus.Errorf("Skipping scenario %s because it is not in state %s", scenario.ScenarioParams.ID, state)
+				continue
+			}
+
 			scenarios = append(scenarios, scenario)
 		}
 
-		return
+		return scenarios
+	}
+	var options []cnappgoat.ListScenariosOption
+	if module == "" && platform == "" && state == "" {
+		logrus.Debugf("list all scenarios for all modules")
+		scenarios = reg.ListScenarios()
+		return scenarios
+	}
+	if module != "" { // Assuming Module has a String method
+		options = append(options, cnappgoat.WithModule(cnappgoat.Module(module)))
 	}
 
-	if module != "" && platform != "" {
-		logrus.Debugf("list all scenarios for %s/%s", module, platform)
-		scenarios = reg.ListScenariosByModuleAndPlatform(cnappgoat.Module(module), cnappgoat.Platform(platform))
-		return
+	if platform != "" { // Assuming Platform has a String method
+		options = append(options, cnappgoat.WithPlatform(cnappgoat.Platform(platform)))
 	}
 
-	if platform != "" {
-		logrus.Debugf("list all scenarios for %s", platform)
-		scenarios = reg.ListScenariosByPlatform(cnappgoat.Platform(platform))
-		return
+	if state != "" { // Assuming State has a String method
+		options = append(options, cnappgoat.WithState(cnappgoat.State{State: state}))
 	}
 
-	if module != "" {
-		logrus.Debugf("list all scenarios for %s", module)
-		scenarios = reg.ListScenariosByModule(cnappgoat.Module(module))
-		return
-	}
-
-	logrus.Debugf("list all scenarios for all modules")
-	scenarios = reg.ListScenarios()
-	return
+	logrus.Debugf("list scenarios for module %s, platform %s, state %s", module, platform, state)
+	scenarios = reg.ListScenariosWithOptions(options...)
+	return scenarios
 }
 
 func separateArgs(args []string) (positional []string) {

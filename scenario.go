@@ -149,6 +149,10 @@ func (s State) String() string {
 	return s.State
 }
 
+func (s State) Equals(state State) bool {
+	return strings.EqualFold(s.State, state.State)
+}
+
 func ModuleFromString(name string) (Module, error) {
 	switch strings.ToLower(name) {
 	case strings.ToLower(CSPM.String()):
@@ -174,5 +178,20 @@ func PlatformFromString(name string) (Platform, error) {
 		return GCP, nil
 	default:
 		return "", errors.New("unknown platform name: " + name)
+	}
+}
+
+func StateFromString(state string) (State, error) {
+	switch strings.ToLower(state) {
+	case strings.ToLower(Deployed):
+		return State{State: Deployed}, nil
+	case strings.ToLower(Destroyed):
+		return State{State: Destroyed}, nil
+	case strings.ToLower(Error):
+		return State{State: Error}, nil
+	case strings.ToLower(NotDeployed):
+		return State{State: NotDeployed}, nil
+	default:
+		return State{}, errors.New("unknown state: " + state)
 	}
 }

@@ -23,7 +23,8 @@ var ProvisionCommand = &cli.Command{
 				c.Args(),
 				reg,
 				c.String("module"),
-				c.String("platform"))
+				c.String("platform"),
+				c.String("state"))
 		if err != nil {
 			return err
 		}
