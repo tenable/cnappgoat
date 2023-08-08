@@ -35,13 +35,13 @@ func NewEngine(registry *Registry, storage *LocalStorage) *Engine {
 func (e *Engine) CleanAll(ctx context.Context, force bool) error {
 	cleanSuccessful := true
 	for _, scenario := range e.Registry.ListScenarios() {
-		if err := e.clean(ctx, scenario, force); err != nil {
-			logrus.WithError(err).Errorf("failed to clean scenario %s", scenario.ScenarioParams.ID)
+		if err := e.Clean(ctx, scenario, force); err != nil {
+			logrus.WithError(err).Errorf("failed to Clean scenario %s", scenario.ScenarioParams.ID)
 			cleanSuccessful = false
 		}
 	}
 	if !cleanSuccessful {
-		return errors.New("failed to clean all scenarios")
+		return errors.New("failed to Clean all scenarios")
 	}
 	return e.Storage.DeleteWorkingDir()
 }
@@ -230,17 +230,20 @@ func (e *Engine) setStackConfigurationFromProjectFile(ctx context.Context, scena
 	return nil
 }
 
-func (e *Engine) clean(ctx context.Context, scenario *Scenario, force bool) error {
+func (e *Engine) Clean(ctx context.Context, scenario *Scenario, force bool) error {
 	if scenario.State.State != NotDeployed && scenario.State.State != Destroyed {
 		if err := e.Destroy(ctx, scenario, force); err != nil {
 			return fmt.Errorf("failed to destroy scenario %s: %v", scenario.ScenarioParams.ID, err)
 		}
 	}
-
+	logrus.Info("removing stack")
 	if err := e.removeStack(ctx, scenario); err != nil {
 		return fmt.Errorf("failed to remove stack %s: %v", scenario.ScenarioParams.ID, err)
 	}
-
+	logrus.Infof("successfully cleaned scenario %s", scenario.ScenarioParams.ID)
+	if err := e.Registry.SetState(scenario, State{State: NotDeployed}); err != nil {
+		return err
+	}
 	return nil
 }
 
