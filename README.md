@@ -39,7 +39,7 @@ and GCP.
     - [Azure CLI](https://docs.microsoft.com/cli/azure/install-azure-cli)
     - [Google Cloud SDK](https://cloud.google.com/sdk/docs/install)
 
-Pulumi dependancies and plugins will install on-demand basis according to scenario's requirements
+Pulumi dependencies and plugins will install in an on-demand basis according to each scenario's requirements
 when you provision your first environment. This means the first time provisioning might take a little longer than
 subsequent
 ones.
@@ -110,7 +110,7 @@ cnappgoat provision <scenario-1> <scenario-2> <scenario-N>
 - `--force` - Enables force mode (unlock locked stacks with pulumi cancel)
 - `--debug` - Enables debug logging.
 
-These flags are command flags and should be placed after the commnad. for example:
+These flags are command flags and should be placed after the command. For example:
 
 ```bash
 cnappgoat provision --module CSPM --platform AWS
@@ -196,7 +196,7 @@ To email the project team, contact [research+cnappgoat@ermetic.com](mailto:resea
 
 ## Disclaimer
 
-* CNAPPgoat is provider "as is" and without any warranty or support.
+* CNAPPgoat is provided "as is" and without any warranty or support.
 * This is a beta version. The project is still in development, so we apologize for any growing pains.
   We will release a stable version in the coming weeks.
 
