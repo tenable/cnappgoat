@@ -24,7 +24,7 @@ var DestroyCommand = &cli.Command{
 				reg,
 				c.String("module"),
 				c.String("platform"),
-				c.String("state"))
+				c.String("status"))
 		if err != nil {
 			return err
 		}
