@@ -104,7 +104,11 @@ func (l *LocalStorage) UpdateScenariosFromGit() (map[string]*Scenario, error) {
 	}
 
 	if metadata != nil && remoteHash == metadata.CommitHash {
-		logrus.Debug("remote hash matches local hash, skipping git update")
+		logrus.Debug("remote hash matches local hash, skipping git update, and updating local saved date")
+		// write the current date to the git metadata file
+		if err := l.writeGitMetadata(remoteHash, today); err != nil {
+			return nil, fmt.Errorf("unable to save git metadata:  %w", err)
+		}
 		scenarios, err := l.loadScenariosFromWorkingDir()
 		if err != nil {
 			return nil, fmt.Errorf("unable to load scenarios from working directory:  %w", err)
