@@ -41,7 +41,7 @@ const (
 	Deployed    = "deployed"
 	Destroyed   = "destroyed"
 	Error       = "error"
-	NotDeployed = "not deployed"
+	NotDeployed = "not-deployed"
 )
 
 type Module string
