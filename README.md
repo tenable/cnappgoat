@@ -53,7 +53,7 @@ brew tap ermetic-research/cnappgoat
 brew install cnappgoat
 ```
 
-#### Downloading the release
+#### Download the release directly for macOS, Linux, and macOS.
 
 1. Download the latest release from [here](https://github.com/ermetic-research/CNAPPgoat/releases/latest).
 
