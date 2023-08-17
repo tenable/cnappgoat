@@ -8,8 +8,6 @@
 
 [![Maintainer][maintainer-1]](mailto:research@ermetic.com)
 
-
-
 # CNAPPgoat
 
 </div>
@@ -46,21 +44,57 @@ ones.
 
 ### Installation
 
-Download the latest release from [here](https://github.com/ermetic-research/CNAPPgoat/releases/latest)
+#### Downloading the release
 
-    tar -xvf cnappgoat-<version>.tar.gz
-    cd cnappgoat-<version>
-    ./cnappgoat list
+1. Download the latest release from [here](https://github.com/ermetic-research/CNAPPgoat/releases/latest).
 
-## CNAPPgoat Scenarios
+   ```bash
+   tar -xvf cnappgoat-<version>.tar.gz
+   cd cnappgoat-<version>
+   ```
 
-CNAPPgoat downloads scenarios from the [cnappgoat-scenarios](https://github.com/ermetic-research/cnappgoat-scenarios)
-repository
-at its first run of every day,
-these scenarios are automatically downloaded when you run CNAPPgoat and are stored in the `~/.cnappgoat/scenarios`
-directory.
+2. (Optional) If you'd like to add the extracted binary to your system's PATH (you don't have to, you can just run it
+   from the local directory as `./cnappgoat`):
+
+**Option A: Move to a directory in your PATH (e.g., `/usr/local/bin` for macOS and Linux)**
+
+   ```bash
+   mv cnappgoat /usr/local/bin/
+   ```
+
+**Option B: Add the directory containing the binary to your PATH**
+
+For bash:
+
+   ```bash
+   echo 'export PATH=$PATH:<path_to_directory_containing_cnappgoat>' >> ~/.bashrc
+   source ~/.bashrc
+   ```
+
+For zsh:
+
+   ```bash
+   echo 'export PATH=$PATH:<path_to_directory_containing_cnappgoat>' >> ~/.zshrc
+   source ~/.zshrc
+   ```
+
+Replace `<path_to_directory_containing_cnappgoat>` with the absolute path to the directory where `cnappgoat` binary
+resides.
+
+#### Installation using Homebrew
+
+For macOS users, CNAPPgoat can be easily installed using the Homebrew package manager. If you haven't already installed
+Homebrew, you can do so by following the instructions on the [official website](https://brew.sh/).
+
+Once Homebrew is set up, you can install CNAPPgoat with the following commands:
+
+```bash
+brew tap ermetic-research/cnappgoat
+brew install cnappgoat
+```
 
 ### Usage
+
 ```
 NAME:
    cnappgoat - A multicloud open-source tool for deploying vulnerable-by-design cloud resources
@@ -85,7 +119,6 @@ GLOBAL OPTIONS:
    --help, -h     show help
    --version, -v  print the version
 ```
-
 
 | Command           | Description                                                                                                          | Usage                                 |
 |-------------------|----------------------------------------------------------------------------------------------------------------------|---------------------------------------|
@@ -117,6 +150,13 @@ cnappgoat provision --module CSPM --platform AWS
 ```
 
 This command will provision all AWS CSPM scenarios.
+
+## CNAPPgoat Scenarios
+
+CNAPPgoat downloads scenarios from the [cnappgoat-scenarios](https://github.com/ermetic-research/cnappgoat-scenarios)
+repository at its first run of every day,
+these scenarios are automatically downloaded when you run CNAPPgoat and are stored in the `~/.cnappgoat/scenarios`
+directory.
 
 ## Setup and Configuration
 
@@ -166,11 +206,14 @@ By setting these credentials, you will be able to deploy scenarios on AWS, Azure
 planning on using CNAPPgoat with a different provider, make sure to configure the credentials accordingly.
 
 ## Learn more
+
 To learn more about CNAPPgoat, check out the post on the Ermetic blog:
 https://ermetic.com/blog/cloud/cnappgoat-multicloud-open-source-tool-for-deploying-vulnerable-by-design-cloud-resources/
 
 ## Acknowledgements
+
 ### Similar projects
+
 CNAPPgoat provisions a breadth of vulnerable scenarios on multiple clouds to test detection and prevention capabilities.
 There are other great projects out there for vulnerable cloud environments that are focused on different areas, such as
 exploitation, detection, CTF (capture the flag) scenarios, etc. We were inspired by these tools and projects, and we
@@ -192,6 +235,7 @@ our list focused specifically on vulnerable-by-design cloud environments that ar
 sandbox.
 
 ## Contact
+
 To email the project team, contact [research+cnappgoat@ermetic.com](mailto:research+cnappgoat@ermetic.com)
 
 ## Disclaimer
