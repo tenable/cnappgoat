@@ -44,6 +44,15 @@ ones.
 
 ### Installation
 
+#### Homebrew
+
+CNAPPgoat can be easily installed for macOS users using the Homebrew package manager.
+
+```bash
+brew tap ermetic-research/cnappgoat
+brew install cnappgoat
+```
+
 #### Downloading the release
 
 1. Download the latest release from [here](https://github.com/ermetic-research/CNAPPgoat/releases/latest).
@@ -80,18 +89,6 @@ For zsh:
 
 Replace `<path_to_directory_containing_cnappgoat>` with the absolute path to the directory where `cnappgoat` binary
 resides.
-
-#### Installation using Homebrew
-
-For macOS users, CNAPPgoat can be easily installed using the Homebrew package manager. If you haven't already installed
-Homebrew, you can do so by following the instructions on the [official website](https://brew.sh/).
-
-Once Homebrew is set up, you can install CNAPPgoat with the following commands:
-
-```bash
-brew tap ermetic-research/cnappgoat
-brew install cnappgoat
-```
 
 ### Usage
 
