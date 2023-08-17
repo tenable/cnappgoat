@@ -72,6 +72,7 @@ func main() {
 			commands.DescribeCommand,
 			commands.DestroyCommand,
 			commands.ListCommand,
+			commands.OutputCommand,
 			commands.ProvisionCommand,
 			maintenance.MaintenanceCommand,
 		},
