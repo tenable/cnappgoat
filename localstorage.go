@@ -306,17 +306,12 @@ func (l *LocalStorage) createScenario(path string) (*Scenario, error) {
 		}
 	}
 
-	hashProj, err := hashFile(path)
+	hash, err := hashDirectory(filepath.Dir(path))
 	if err != nil {
-		return nil, fmt.Errorf("could not hash file: %w", err)
+		return nil, fmt.Errorf("could not hash directory: %w", err)
 	}
 
-	hashMain, err := hashFile(filepath.Join(filepath.Dir(path), "main.go"))
-	if err != nil {
-		return nil, fmt.Errorf("could not hash file: %w", err)
-	}
-
-	scenario.Hash = hashProj + hashMain
+	scenario.Hash = hash
 	return &scenario, nil
 }
 
@@ -403,6 +398,37 @@ func getLocalWorkDirPath() (string, error) {
 	return filepath.Join(homeDir, ".cnappgoat"), nil
 }
 
+func hashDirectory(dirPath string) (string, error) {
+	var builder strings.Builder
+
+	err := filepath.Walk(dirPath, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+
+		if info.IsDir() || isExcluded(filepath.Base(path)) {
+			return nil
+		}
+
+		hash, err := hashFile(path)
+		if err != nil {
+			return err
+		}
+		builder.WriteString(hash)
+		return nil
+	})
+
+	if err != nil {
+		return "", fmt.Errorf("error walking the path %v: %w", dirPath, err)
+	}
+
+	hasher := sha256.New()
+	if _, err := hasher.Write([]byte(builder.String())); err != nil {
+		return "", fmt.Errorf("error writing to hasher: %w", err)
+	}
+	return hex.EncodeToString(hasher.Sum(nil)), nil
+}
+
 func hashFile(filepath string) (string, error) {
 	// check if file exists
 	if _, err := os.Stat(filepath); os.IsNotExist(err) {
@@ -425,6 +451,16 @@ func hashFile(filepath string) (string, error) {
 	}
 
 	return hex.EncodeToString(hasher.Sum(nil)), nil
+}
+
+func isExcluded(filename string) bool {
+	if filename == "state.yaml" {
+		return true
+	}
+	if strings.HasPrefix(filename, "Pulumi.") && strings.HasSuffix(filename, ".yaml") && filename != "Pulumi.yaml" {
+		return true
+	}
+	return false
 }
 
 func copyFile(srcPath, dstPath string) error {
