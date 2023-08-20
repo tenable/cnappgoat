@@ -18,6 +18,11 @@ func CommandBefore(c *cli.Context) error {
 			return err
 		}
 	}
+	if state := c.String("status"); state != "" {
+		if _, err := cnappgoat.StateFromString(state); err != nil {
+			return err
+		}
+	}
 
 	return nil
 }
@@ -68,6 +73,11 @@ func CommandFlags() []cli.Flag {
 			Name:    "platform",
 			Usage:   "CNAPPgoat platform to operate on, e.g. 'AWS, 'AZURE', 'GCP'",
 			Aliases: []string{"p"},
+		},
+		&cli.StringFlag{
+			Name:    "status",
+			Usage:   "CNAPPgoat status to filter on, e.g. 'deployed', 'destroyed', 'error', 'not-deployed'",
+			Aliases: []string{"s"},
 		},
 	}
 }

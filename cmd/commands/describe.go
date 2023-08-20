@@ -44,7 +44,8 @@ var DescribeCommand = &cli.Command{
 			c.Args(),
 			reg,
 			c.String("module"),
-			c.String("platform"))
+			c.String("platform"),
+			c.String("status"))
 		if err != nil {
 			return err
 		}

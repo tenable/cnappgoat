@@ -10,6 +10,14 @@ type Registry struct {
 	storage   *LocalStorage
 }
 
+type ListScenariosOptions struct {
+	Module   Module
+	Platform Platform
+	State    State
+}
+
+type ListScenariosOption func(options *ListScenariosOptions)
+
 func NewRegistry(s *LocalStorage) (*Registry, error) {
 	registry := Registry{
 		scenarios: make(map[string]*Scenario),
@@ -67,10 +75,17 @@ func (r *Registry) ListScenarios() []*Scenario {
 	return scenarios
 }
 
-func (r *Registry) ListScenariosByModule(module Module) []*Scenario {
+func (r *Registry) ListScenariosWithOptions(opts ...ListScenariosOption) []*Scenario {
+	options := ListScenariosOptions{}
+	for _, opt := range opts {
+		opt(&options)
+	}
+
 	var scenarios []*Scenario
 	for name := range r.scenarios {
-		if r.scenarios[name].ScenarioParams.Module.Equals(module) || module.Equals("") {
+		if (r.scenarios[name].ScenarioParams.Platform.Equals(options.Platform) || options.Platform.Equals("")) &&
+			(r.scenarios[name].ScenarioParams.Module.Equals(options.Module) || options.Module.Equals("")) &&
+			(r.scenarios[name].State.Equals(options.State) || options.State.Equals(State{})) {
 			scenarios = append(scenarios, r.scenarios[name])
 		}
 	}
@@ -79,29 +94,22 @@ func (r *Registry) ListScenariosByModule(module Module) []*Scenario {
 	return scenarios
 }
 
-func (r *Registry) ListScenariosByPlatform(platform Platform) []*Scenario {
-	var scenarios []*Scenario
-	for name := range r.scenarios {
-		if r.scenarios[name].ScenarioParams.Platform.Equals(platform) || platform.Equals("") {
-			scenarios = append(scenarios, r.scenarios[name])
-		}
+func WithModule(module Module) ListScenariosOption {
+	return func(opts *ListScenariosOptions) {
+		opts.Module = module
 	}
-
-	sortScenarios(scenarios)
-	return scenarios
 }
 
-func (r *Registry) ListScenariosByModuleAndPlatform(module Module, platform Platform) []*Scenario {
-	var scenarios []*Scenario
-	for name := range r.scenarios {
-		if r.scenarios[name].ScenarioParams.Module.Equals(module) &&
-			r.scenarios[name].ScenarioParams.Platform.Equals(platform) {
-			scenarios = append(scenarios, r.scenarios[name])
-		}
+func WithPlatform(platform Platform) ListScenariosOption {
+	return func(opts *ListScenariosOptions) {
+		opts.Platform = platform
 	}
+}
 
-	sortScenarios(scenarios)
-	return scenarios
+func WithState(state State) ListScenariosOption {
+	return func(opts *ListScenariosOptions) {
+		opts.State = state
+	}
 }
 
 func (r *Registry) SetState(scenario *Scenario, state State) error {
