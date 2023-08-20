@@ -18,6 +18,11 @@ var ImportScenariosCommand = &cli.Command{
 			Aliases: []string{"d"},
 			Value:   "",
 		},
+		&cli.BoolFlag{
+			Name:  "debug",
+			Usage: "Enable debug mode",
+			Value: false,
+		},
 	},
 	Before: func(c *cli.Context) error {
 		if err := common.CommandBefore(c); err != nil {

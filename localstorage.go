@@ -201,14 +201,15 @@ func (l *LocalStorage) updateScenariosFromFolder(scenariosFullPath string) (map[
 						return nil, fmt.Errorf("unable to copy scenario to working directory:  %w", err)
 					}
 					scenariosFromWorkDir[scenarioFromScenariosDir.ScenarioParams.ID] = scenarioFromScenariosDir
+					logrus.Infof("scenario %v exists in the working directory but has changed. Updating.", scenarioFromWorkDir.ScenarioParams.ID)
 				} else {
-					logrus.Debugf("Scenario %v exists in the working directory and has not changed. Skipping.", scenarioFromWorkDir.ScenarioParams.ID)
+					logrus.Debugf("scenario %v exists in the working directory and has not changed. Skipping.", scenarioFromWorkDir.ScenarioParams.ID)
 				}
 			}
 		}
 		if !exists {
 			// if the scenario does not exist in the working directory, copy it over
-			logrus.Debugf("Scenario %v does not exist in the working directory. Copying over.", scenarioFromScenariosDir.ScenarioParams.ID)
+			logrus.Infof("scenario %v does not exist in the working directory. Copying over.", scenarioFromScenariosDir.ScenarioParams.ID)
 			err = l.copyScenario(scenarioFromScenariosDir)
 			if err != nil {
 				return nil, fmt.Errorf("unable to copy scenario to working directory:  %w", err)
