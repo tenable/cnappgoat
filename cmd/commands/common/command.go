@@ -76,7 +76,7 @@ func CommandFlags() []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:    "status",
-			Usage:   "CNAPPgoat status to filter on, e.g. 'Deployed', 'Destroyed', 'Error', 'Not Deployed'",
+			Usage:   "CNAPPgoat status to filter on, e.g. 'deployed', 'destroyed', 'error', 'not-deployed'",
 			Aliases: []string{"s"},
 		},
 	}
