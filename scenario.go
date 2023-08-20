@@ -50,6 +50,7 @@ const (
 	CIEM Module = "CIEM"
 	CSPM Module = "CSPM"
 	CWPP Module = "CWPP"
+	DSPM Module = "DSPM"
 	IAC  Module = "IAC"
 )
 
@@ -71,14 +72,16 @@ func (m Module) MarshalYAML() (interface{}, error) {
 
 func (m Module) String() string {
 	switch m {
+	case CIEM:
+		return "CIEM"
 	case CSPM:
 		return "CSPM"
 	case CWPP:
 		return "CWPP"
+	case DSPM:
+		return "DSPM"
 	case IAC:
 		return "IAC"
-	case CIEM:
-		return "CIEM"
 	default:
 		panic("CNAPPgoat module name not formatted")
 	}
@@ -155,14 +158,16 @@ func (s State) Equals(state State) bool {
 
 func ModuleFromString(name string) (Module, error) {
 	switch strings.ToLower(name) {
+	case strings.ToLower(CIEM.String()):
+		return CIEM, nil
 	case strings.ToLower(CSPM.String()):
 		return CSPM, nil
 	case strings.ToLower(CWPP.String()):
 		return CWPP, nil
+	case strings.ToLower(DSPM.String()):
+		return DSPM, nil
 	case strings.ToLower(IAC.String()):
 		return IAC, nil
-	case strings.ToLower(CIEM.String()):
-		return CIEM, nil
 	default:
 		return "", errors.New("unknown CNAPPgoat module name: " + name)
 	}
