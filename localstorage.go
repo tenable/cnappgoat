@@ -144,6 +144,9 @@ func (l *LocalStorage) ReadCnappGoatConfig(scenario *Scenario) (map[string]strin
 	if err = yaml.Unmarshal(data, &cnappGoatConfig); err != nil {
 		return nil, fmt.Errorf("failed to parse Pulumi.yaml: %w", err)
 	}
+	if err := cnappGoatConfig.ScenarioParams.IsValid(); err != nil {
+		return nil, fmt.Errorf("scenarioParams field is empty for scenario %v", scenario.Name)
+	}
 
 	return cnappGoatConfig.ScenarioParams.Config, nil
 }
@@ -179,6 +182,9 @@ func (l *LocalStorage) updateScenariosFromFolder(scenariosFullPath string) (map[
 		return nil, fmt.Errorf("scenario folder does not exist, cannot perform UpdateScenarioFolder: %s", scenariosFullPath)
 	}
 	scenariosFromScenarioDir, err := l.loadScenarios(scenariosFullPath)
+	if err != nil {
+		return nil, fmt.Errorf("unable to load scenarios from scenario directory:  %w", err)
+	}
 	var scenariosFromWorkDir map[string]*Scenario
 	if l.WorkingDirectoryExists() {
 		scenariosFromWorkDir, err = l.loadScenarios(l.WorkingDir)
@@ -287,6 +293,9 @@ func (l *LocalStorage) createScenario(path string) (*Scenario, error) {
 	scenario := Scenario{}
 	if err = yaml.Unmarshal(data, &scenario); err != nil {
 		return nil, fmt.Errorf("failed to parse Pulumi.yaml: %w", err)
+	}
+	if err = scenario.ScenarioParams.IsValid(); err != nil {
+		return nil, fmt.Errorf("scenarioParams field is empty for scenario %v", scenario.Name)
 	}
 
 	scenario.SrcDir = filepath.Dir(path)
