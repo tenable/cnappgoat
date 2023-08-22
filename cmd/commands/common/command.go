@@ -81,3 +81,13 @@ func CommandFlags() []cli.Flag {
 		},
 	}
 }
+
+func OutputFlags() []cli.Flag {
+	return append(
+		CommandFlags(),
+		&cli.BoolFlag{
+			Name:  "show-secrets",
+			Usage: "Show secret values",
+			Value: false,
+		})
+}

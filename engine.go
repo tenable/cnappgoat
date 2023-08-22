@@ -119,6 +119,33 @@ func (e *Engine) InitializeScenarioWorkspace(ctx context.Context, scenario *Scen
 	return ws, nil
 }
 
+func (e *Engine) Output(ctx context.Context, scenario *Scenario) (auto.OutputMap, error) {
+	if scenario.State.State != Deployed && scenario.State.State != Error {
+		logrus.Debugf("scenario %s is not deployed, skipping.", scenario.ScenarioParams.ID)
+		return nil, nil
+	}
+	stackName := getScenarioStackName(scenario)
+	stack, err := e.initializeStackAndWorkspace(ctx, scenario, stackName)
+	if err != nil {
+		return nil, e.writeErrorState(scenario, err, "failed to initialize stack and workspace")
+	}
+	if err :=
+		e.refresh(
+			ctx,
+			stack,
+			false,
+			scenario); err != nil {
+		return nil, err
+	}
+
+	outputs, err := stack.Outputs(ctx)
+	if err != nil {
+		return nil, e.writeErrorState(scenario, err, "failed to get outputs")
+	}
+
+	return outputs, nil
+}
+
 func (e *Engine) Provision(ctx context.Context, scenario *Scenario, force bool, opts ...Option) (auto.OutputMap, error) {
 	options := &ProvisionOptions{}
 	for _, opt := range opts {
