@@ -144,6 +144,9 @@ func (l *LocalStorage) ReadCnappGoatConfig(scenario *Scenario) (map[string]strin
 	if err = yaml.Unmarshal(data, &cnappGoatConfig); err != nil {
 		return nil, fmt.Errorf("failed to parse Pulumi.yaml: %w", err)
 	}
+	if err := cnappGoatConfig.ScenarioParams.IsValid(); err != nil {
+		return nil, fmt.Errorf("scenarioParams field is empty for scenario %v", scenario.Name)
+	}
 
 	return cnappGoatConfig.ScenarioParams.Config, nil
 }
@@ -179,6 +182,9 @@ func (l *LocalStorage) updateScenariosFromFolder(scenariosFullPath string) (map[
 		return nil, fmt.Errorf("scenario folder does not exist, cannot perform UpdateScenarioFolder: %s", scenariosFullPath)
 	}
 	scenariosFromScenarioDir, err := l.loadScenarios(scenariosFullPath)
+	if err != nil {
+		return nil, fmt.Errorf("unable to load scenarios from scenario directory:  %w", err)
+	}
 	var scenariosFromWorkDir map[string]*Scenario
 	if l.WorkingDirectoryExists() {
 		scenariosFromWorkDir, err = l.loadScenarios(l.WorkingDir)
@@ -201,14 +207,15 @@ func (l *LocalStorage) updateScenariosFromFolder(scenariosFullPath string) (map[
 						return nil, fmt.Errorf("unable to copy scenario to working directory:  %w", err)
 					}
 					scenariosFromWorkDir[scenarioFromScenariosDir.ScenarioParams.ID] = scenarioFromScenariosDir
+					logrus.Infof("scenario %v exists in the working directory but has changed. Updating.", scenarioFromWorkDir.ScenarioParams.ID)
 				} else {
-					logrus.Debugf("Scenario %v exists in the working directory and has not changed. Skipping.", scenarioFromWorkDir.ScenarioParams.ID)
+					logrus.Debugf("scenario %v exists in the working directory and has not changed. Skipping.", scenarioFromWorkDir.ScenarioParams.ID)
 				}
 			}
 		}
 		if !exists {
 			// if the scenario does not exist in the working directory, copy it over
-			logrus.Debugf("Scenario %v does not exist in the working directory. Copying over.", scenarioFromScenariosDir.ScenarioParams.ID)
+			logrus.Infof("scenario %v does not exist in the working directory. Copying over.", scenarioFromScenariosDir.ScenarioParams.ID)
 			err = l.copyScenario(scenarioFromScenariosDir)
 			if err != nil {
 				return nil, fmt.Errorf("unable to copy scenario to working directory:  %w", err)
@@ -286,6 +293,9 @@ func (l *LocalStorage) createScenario(path string) (*Scenario, error) {
 	scenario := Scenario{}
 	if err = yaml.Unmarshal(data, &scenario); err != nil {
 		return nil, fmt.Errorf("failed to parse Pulumi.yaml: %w", err)
+	}
+	if err = scenario.ScenarioParams.IsValid(); err != nil {
+		return nil, fmt.Errorf("scenarioParams field is empty for scenario %v", scenario.Name)
 	}
 
 	scenario.SrcDir = filepath.Dir(path)

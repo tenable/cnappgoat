@@ -20,6 +20,7 @@ var MaintenanceCommand = &cli.Command{
 		plugins.PluginsCommand,
 		stacks.StacksCommand,
 		commands.GetScenariosCommand,
+		commands.ImportScenariosCommand,
 	},
 	Hidden: true,
 }

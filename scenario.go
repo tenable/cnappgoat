@@ -2,6 +2,7 @@ package cnappgoat
 
 import (
 	"errors"
+	"fmt"
 	"strings"
 
 	"gopkg.in/yaml.v3"
@@ -83,7 +84,7 @@ func (m Module) String() string {
 	case IAC:
 		return "IAC"
 	default:
-		panic("CNAPPgoat module name not formatted")
+		return ""
 	}
 }
 
@@ -110,7 +111,7 @@ func (p Platform) String() string {
 	case GCP:
 		return "GCP"
 	default:
-		panic("platform name not formatted")
+		return ""
 	}
 }
 
@@ -143,7 +144,9 @@ func (r *runtime) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	if name, ok := runtimeObj["name"].(string); ok {
 		r.Name = name
 	}
-	r.Options = runtimeObj
+	if options, ok := runtimeObj["options"].(map[string]interface{}); ok {
+		r.Options = options
+	}
 
 	return nil
 }
@@ -169,7 +172,7 @@ func ModuleFromString(name string) (Module, error) {
 	case strings.ToLower(IAC.String()):
 		return IAC, nil
 	default:
-		return "", errors.New("unknown CNAPPgoat module name: " + name)
+		return "", errors.New("unknown module name: " + name)
 	}
 }
 
@@ -199,4 +202,52 @@ func StateFromString(state string) (State, error) {
 	default:
 		return State{}, errors.New("unknown state: " + state)
 	}
+}
+
+func (p scenarioParams) IsValid() error {
+	if p.Module == "" && p.Platform == "" && p.ID == "" && p.FriendlyName == "" && p.Description == "" && p.ScenarioType == "" {
+		return errors.New("scenarioParams is empty, yaml is missing value cnappgoat-params")
+	}
+	if p.Module == "" {
+		return errors.New("module is required")
+	}
+	if p.Platform == "" {
+		return errors.New("platform is required")
+	}
+	if p.ID == "" {
+		return errors.New("id is required")
+	}
+	if len(strings.Split(p.ID, "-")) < 3 {
+		return fmt.Errorf("id must be in the format of <module>-<platform>-<id>, id is: %s", p.ID)
+	}
+	// module must be valid
+	if _, err := ModuleFromString(string(p.Module)); err != nil {
+		return err
+	}
+	// platform must be valid
+	if _, err := PlatformFromString(string(p.Platform)); err != nil {
+		return err
+	}
+	if !p.Module.Equals(Module(strings.Split(p.ID, "-")[0])) {
+		return fmt.Errorf("id must start with matching module name: %s, id is: %v", p.Module, p.ID)
+	}
+	if !p.Platform.Equals(Platform(strings.Split(p.ID, "-")[1])) {
+		return fmt.Errorf("id must include matching platform name, id is: %v", p.ID)
+	}
+	if p.FriendlyName == "" {
+		return errors.New("friendlyName is required")
+	}
+	if p.Description == "" {
+		return errors.New("description is required")
+	}
+	if p.ScenarioType == "" {
+		return errors.New("scenarioType is required")
+	}
+	if _, err := ModuleFromString(string(p.Module)); err != nil {
+		return err
+	}
+	if _, err := PlatformFromString(string(p.Platform)); err != nil {
+		return err
+	}
+	return nil
 }

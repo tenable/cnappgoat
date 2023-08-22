@@ -117,6 +117,10 @@ func (r *Registry) SetState(scenario *Scenario, state State) error {
 	return r.storage.WriteStateToFile(r.scenarios[scenario.ScenarioParams.ID], state)
 }
 
+func (r *Registry) ImportScenarios(path string) (map[string]*Scenario, error) {
+	return r.storage.updateScenariosFromFolder(path)
+}
+
 func sortScenarios(scenarios []*Scenario) {
 	sort.Slice(scenarios, func(i, j int) bool {
 		return scenarios[i].ScenarioParams.ID < scenarios[j].ScenarioParams.ID
