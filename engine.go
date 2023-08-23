@@ -9,6 +9,8 @@ import (
 	"github.com/pulumi/pulumi/sdk/v3/go/auto/optup"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/workspace"
 	"github.com/sirupsen/logrus"
+	"os"
+	"strings"
 )
 
 type Engine struct {
@@ -97,9 +99,14 @@ func (e *Engine) InitializeScenarioWorkspace(ctx context.Context, scenario *Scen
 
 	wd := auto.WorkDir(scenarioWorkDir)
 	secretsProvider := auto.SecretsProvider("passphrase")
-	ws, err := auto.NewLocalWorkspace(ctx, wd, ph, secretsProvider, auto.EnvVars(map[string]string{
-		"PULUMI_CONFIG_PASSPHRASE": "cnappgoat12345!",
-	}))
+
+	envMap, err := environToMap()
+	if err != nil {
+		return nil, err
+	}
+	envMap["PULUMI_CONFIG_PASSPHRASE"] = "cnappgoat12345!"
+	logrus.WithField("envMap", envMap).Debug("envMap")
+	ws, err := auto.NewLocalWorkspace(ctx, wd, ph, secretsProvider, auto.EnvVars(envMap))
 	if err != nil {
 		return nil, fmt.Errorf("failed to create new local workspace: %w", err)
 	}
@@ -348,4 +355,28 @@ func (e *Engine) refresh(ctx context.Context, stack auto.Stack, force bool, scen
 
 func getScenarioStackName(scenario *Scenario) string {
 	return "cnappgoat_" + scenario.ScenarioParams.ID
+}
+
+func environToMap() (map[string]string, error) {
+	envs := os.Environ()
+	envMap := make(map[string]string, len(envs))
+
+	for _, env := range envs {
+		parts := strings.SplitN(env, "=", 2) // Split only on the first '='
+		if len(parts) != 2 {
+			return nil, fmt.Errorf("invalid environment variable format: %s", env)
+		}
+
+		key := parts[0]
+		value := parts[1]
+
+		if key == "" {
+			continue
+			//return nil, fmt.Errorf("empty environment variable key found for value: %s", value)
+		}
+
+		envMap[key] = value
+	}
+
+	return envMap, nil
 }
