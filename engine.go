@@ -10,6 +10,7 @@ import (
 	"github.com/pulumi/pulumi/sdk/v3/go/common/workspace"
 	"github.com/sirupsen/logrus"
 	"os"
+	"os/exec"
 	"strings"
 )
 
@@ -171,6 +172,10 @@ func (e *Engine) Provision(ctx context.Context, scenario *Scenario, force bool, 
 	stack, err := auto.UpsertStack(ctx, stackName, ws)
 	if err != nil {
 		return nil, e.writeErrorState(scenario, err, "failed to initialize scenario stack")
+	}
+
+	if err = e.setStackConfigurationFromGlobalSettings(ctx, scenario, stack); err != nil {
+		return nil, e.writeErrorState(scenario, err, "failed to set stack configuration from global settings")
 	}
 
 	if err = e.setStackConfigurationFromProjectFile(ctx, scenario, stack); err != nil {
@@ -357,6 +362,13 @@ func getScenarioStackName(scenario *Scenario) string {
 	return "cnappgoat_" + scenario.ScenarioParams.ID
 }
 
+func getValueFromEnvOrGcloudConfig(configKey string, vars ...string) string {
+	if value := getEnv(vars...); value != "" {
+		return value
+	}
+	return getGcloudValue(configKey)
+}
+
 func environToMap() (map[string]string, error) {
 	envs := os.Environ()
 	envMap := make(map[string]string, len(envs))
@@ -379,4 +391,43 @@ func environToMap() (map[string]string, error) {
 	}
 
 	return envMap, nil
+}
+func (e *Engine) setStackConfigurationFromGlobalSettings(ctx context.Context, scenario *Scenario, s auto.Stack) error {
+	if project := getValueFromEnvOrGcloudConfig("core/project", "GOOGLE_PROJECT", "GOOGLE_CLOUD_PROJECT", "GCLOUD_PROJECT", "CLOUDSDK_CORE_PROJECT"); project != "" {
+		if err := s.SetConfig(ctx, "gcp:project", auto.ConfigValue{Value: project}); err != nil {
+			return e.writeErrorState(scenario, err, "failed to set config")
+		}
+	}
+
+	if region := getValueFromEnvOrGcloudConfig("compute/region", "GOOGLE_REGION", "GCLOUD_REGION", "CLOUDSDK_COMPUTE_REGION"); region != "" {
+		if err := s.SetConfig(ctx, "gcp:region", auto.ConfigValue{Value: region}); err != nil {
+			return e.writeErrorState(scenario, err, "failed to set config")
+		}
+	}
+
+	if zone := getValueFromEnvOrGcloudConfig("compute/zone", "GOOGLE_ZONE", "GCLOUD_ZONE", "CLOUDSDK_COMPUTE_ZONE"); zone != "" {
+		if err := s.SetConfig(ctx, "gcp:zone", auto.ConfigValue{Value: zone}); err != nil {
+			return e.writeErrorState(scenario, err, "failed to set config")
+		}
+	}
+
+	return nil
+}
+
+func getGcloudValue(configKey string) string {
+	cmd := exec.Command("gcloud", "config", "get-value", configKey)
+	output, err := cmd.Output()
+	if err != nil {
+		return ""
+	}
+	return strings.TrimSpace(string(output))
+}
+
+func getEnv(vars ...string) string {
+	for _, v := range vars {
+		if value := os.Getenv(v); value != "" {
+			return value
+		}
+	}
+	return ""
 }
