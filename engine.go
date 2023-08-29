@@ -393,24 +393,40 @@ func environToMap() (map[string]string, error) {
 	return envMap, nil
 }
 func (e *Engine) setStackConfigurationFromGlobalSettings(ctx context.Context, scenario *Scenario, s auto.Stack) error {
-	if project := getValueFromEnvOrGcloudConfig("core/project", "GOOGLE_PROJECT", "GOOGLE_CLOUD_PROJECT", "GCLOUD_PROJECT", "CLOUDSDK_CORE_PROJECT"); project != "" {
-		if err := s.SetConfig(ctx, "gcp:project", auto.ConfigValue{Value: project}); err != nil {
-			return e.writeErrorState(scenario, err, "failed to set config")
+	if scenario.ScenarioParams.Platform == GCP {
+		if _, err := exec.LookPath("gcloud"); err != nil {
+			return e.writeErrorState(scenario, err, "Google Cloud CLI is not installed or configured correctly")
+		}
+		if project := getValueFromEnvOrGcloudConfig("core/project", "GOOGLE_PROJECT", "GOOGLE_CLOUD_PROJECT", "GCLOUD_PROJECT", "CLOUDSDK_CORE_PROJECT"); project != "" {
+			if err := s.SetConfig(ctx, "gcp:project", auto.ConfigValue{Value: project}); err != nil {
+				return e.writeErrorState(scenario, err, "failed to set config")
+			}
+		}
+
+		if region := getValueFromEnvOrGcloudConfig("compute/region", "GOOGLE_REGION", "GCLOUD_REGION", "CLOUDSDK_COMPUTE_REGION"); region != "" {
+			if err := s.SetConfig(ctx, "gcp:region", auto.ConfigValue{Value: region}); err != nil {
+				return e.writeErrorState(scenario, err, "failed to set config")
+			}
+		}
+
+		if zone := getValueFromEnvOrGcloudConfig("compute/zone", "GOOGLE_ZONE", "GCLOUD_ZONE", "CLOUDSDK_COMPUTE_ZONE"); zone != "" {
+			if err := s.SetConfig(ctx, "gcp:zone", auto.ConfigValue{Value: zone}); err != nil {
+				return e.writeErrorState(scenario, err, "failed to set config")
+			}
 		}
 	}
 
-	if region := getValueFromEnvOrGcloudConfig("compute/region", "GOOGLE_REGION", "GCLOUD_REGION", "CLOUDSDK_COMPUTE_REGION"); region != "" {
-		if err := s.SetConfig(ctx, "gcp:region", auto.ConfigValue{Value: region}); err != nil {
-			return e.writeErrorState(scenario, err, "failed to set config")
+	if scenario.ScenarioParams.Platform == AWS {
+		if _, err := exec.LookPath("aws"); err != nil {
+			return e.writeErrorState(scenario, err, "AWS CLI is not installed or configured correctly")
 		}
 	}
 
-	if zone := getValueFromEnvOrGcloudConfig("compute/zone", "GOOGLE_ZONE", "GCLOUD_ZONE", "CLOUDSDK_COMPUTE_ZONE"); zone != "" {
-		if err := s.SetConfig(ctx, "gcp:zone", auto.ConfigValue{Value: zone}); err != nil {
-			return e.writeErrorState(scenario, err, "failed to set config")
+	if scenario.ScenarioParams.Platform == Azure {
+		if _, err := exec.LookPath("az"); err != nil {
+			return e.writeErrorState(scenario, err, "Azure CLI is not installed or configured correctly")
 		}
 	}
-
 	return nil
 }
 
