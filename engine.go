@@ -9,6 +9,9 @@ import (
 	"github.com/pulumi/pulumi/sdk/v3/go/auto/optup"
 	"github.com/pulumi/pulumi/sdk/v3/go/common/workspace"
 	"github.com/sirupsen/logrus"
+	"os"
+	"os/exec"
+	"strings"
 )
 
 type Engine struct {
@@ -97,9 +100,14 @@ func (e *Engine) InitializeScenarioWorkspace(ctx context.Context, scenario *Scen
 
 	wd := auto.WorkDir(scenarioWorkDir)
 	secretsProvider := auto.SecretsProvider("passphrase")
-	ws, err := auto.NewLocalWorkspace(ctx, wd, ph, secretsProvider, auto.EnvVars(map[string]string{
-		"PULUMI_CONFIG_PASSPHRASE": "cnappgoat12345!",
-	}))
+
+	envMap, err := environToMap()
+	if err != nil {
+		return nil, err
+	}
+	envMap["PULUMI_CONFIG_PASSPHRASE"] = "cnappgoat12345!"
+	logrus.WithField("envMap", envMap).Debug("envMap")
+	ws, err := auto.NewLocalWorkspace(ctx, wd, ph, secretsProvider, auto.EnvVars(envMap))
 	if err != nil {
 		return nil, fmt.Errorf("failed to create new local workspace: %w", err)
 	}
@@ -164,6 +172,10 @@ func (e *Engine) Provision(ctx context.Context, scenario *Scenario, force bool, 
 	stack, err := auto.UpsertStack(ctx, stackName, ws)
 	if err != nil {
 		return nil, e.writeErrorState(scenario, err, "failed to initialize scenario stack")
+	}
+
+	if err = e.setStackConfigurationFromGlobalSettings(ctx, scenario, stack); err != nil {
+		return nil, e.writeErrorState(scenario, err, "failed to set stack configuration from global settings")
 	}
 
 	if err = e.setStackConfigurationFromProjectFile(ctx, scenario, stack); err != nil {
@@ -348,4 +360,90 @@ func (e *Engine) refresh(ctx context.Context, stack auto.Stack, force bool, scen
 
 func getScenarioStackName(scenario *Scenario) string {
 	return "cnappgoat_" + scenario.ScenarioParams.ID
+}
+
+func getValueFromEnvOrGcloudConfig(configKey string, vars ...string) string {
+	if value := getEnv(vars...); value != "" {
+		return value
+	}
+	return getGcloudValue(configKey)
+}
+
+func environToMap() (map[string]string, error) {
+	envs := os.Environ()
+	envMap := make(map[string]string, len(envs))
+
+	for _, env := range envs {
+		parts := strings.SplitN(env, "=", 2) // Split only on the first '='
+		if len(parts) != 2 {
+			return nil, fmt.Errorf("invalid environment variable format: %s", env)
+		}
+
+		key := parts[0]
+		value := parts[1]
+
+		if key == "" {
+			continue
+			//return nil, fmt.Errorf("empty environment variable key found for value: %s", value)
+		}
+
+		envMap[key] = value
+	}
+
+	return envMap, nil
+}
+func (e *Engine) setStackConfigurationFromGlobalSettings(ctx context.Context, scenario *Scenario, s auto.Stack) error {
+	if scenario.ScenarioParams.Platform == GCP {
+		if _, err := exec.LookPath("gcloud"); err != nil {
+			return e.writeErrorState(scenario, err, "Google Cloud CLI is not installed or configured correctly")
+		}
+		if project := getValueFromEnvOrGcloudConfig("core/project", "GOOGLE_PROJECT", "GOOGLE_CLOUD_PROJECT", "GCLOUD_PROJECT", "CLOUDSDK_CORE_PROJECT"); project != "" {
+			if err := s.SetConfig(ctx, "gcp:project", auto.ConfigValue{Value: project}); err != nil {
+				return e.writeErrorState(scenario, err, "failed to set config")
+			}
+		}
+
+		if region := getValueFromEnvOrGcloudConfig("compute/region", "GOOGLE_REGION", "GCLOUD_REGION", "CLOUDSDK_COMPUTE_REGION"); region != "" {
+			if err := s.SetConfig(ctx, "gcp:region", auto.ConfigValue{Value: region}); err != nil {
+				return e.writeErrorState(scenario, err, "failed to set config")
+			}
+		}
+
+		if zone := getValueFromEnvOrGcloudConfig("compute/zone", "GOOGLE_ZONE", "GCLOUD_ZONE", "CLOUDSDK_COMPUTE_ZONE"); zone != "" {
+			if err := s.SetConfig(ctx, "gcp:zone", auto.ConfigValue{Value: zone}); err != nil {
+				return e.writeErrorState(scenario, err, "failed to set config")
+			}
+		}
+	}
+
+	if scenario.ScenarioParams.Platform == AWS {
+		if _, err := exec.LookPath("aws"); err != nil {
+			return e.writeErrorState(scenario, err, "AWS CLI is not installed or configured correctly")
+		}
+	}
+
+	if scenario.ScenarioParams.Platform == Azure {
+		if _, err := exec.LookPath("az"); err != nil {
+			return e.writeErrorState(scenario, err, "Azure CLI is not installed or configured correctly")
+		}
+	}
+	return nil
+}
+
+func getGcloudValue(configKey string) string {
+	cmd := exec.Command("gcloud", "config", "get-value", configKey)
+	output, err := cmd.Output()
+	if err != nil {
+		return ""
+	}
+	return strings.TrimSpace(string(output))
+}
+
+func getEnv(vars ...string) string {
+	for _, v := range vars {
+		if value := os.Getenv(v); value != "" {
+			return value
+		}
+	}
+	return ""
 }

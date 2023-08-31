@@ -2,7 +2,7 @@ package common
 
 import (
 	"context"
-
+	
 	cnappgoat "github.com/ermetic-research/CNAPPgoat"
 	"github.com/ermetic-research/CNAPPgoat/cmd/commands/common"
 	"github.com/pulumi/pulumi/sdk/v3/go/auto"
