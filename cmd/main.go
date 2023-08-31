@@ -21,6 +21,13 @@ var (
 	commit  = "N/A"
 )
 
+func init() {
+	logrus.SetFormatter(&logrus.TextFormatter{
+		DisableQuote: true,
+		ForceColors:  true,
+	})
+}
+
 func main() {
 	app := &cli.App{
 		Name:  "cnappgoat",
