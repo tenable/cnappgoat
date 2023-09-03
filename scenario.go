@@ -53,6 +53,7 @@ const (
 	CWPP Module = "CWPP"
 	DSPM Module = "DSPM"
 	IAC  Module = "IAC"
+	KSPM Module = "KSPM"
 )
 
 type Platform string
@@ -83,6 +84,8 @@ func (m Module) String() string {
 		return "DSPM"
 	case IAC:
 		return "IAC"
+	case KSPM:
+		return "KSPM"
 	default:
 		return ""
 	}
@@ -171,6 +174,8 @@ func ModuleFromString(name string) (Module, error) {
 		return DSPM, nil
 	case strings.ToLower(IAC.String()):
 		return IAC, nil
+	case strings.ToLower(KSPM.String()):
+		return KSPM, nil
 	default:
 		return "", errors.New("unknown module name: " + name)
 	}
