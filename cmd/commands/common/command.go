@@ -66,7 +66,7 @@ func CommandFlags() []cli.Flag {
 		},
 		&cli.StringFlag{
 			Name:    "module",
-			Usage:   "CNAPPgoat module to operate on, e.g. 'CIEM, 'CSPM', 'CWPP', 'DSPM', 'IAC'",
+			Usage:   "CNAPPgoat module to operate on, e.g. 'CIEM, 'CSPM', 'CWPP', 'DSPM', 'KSPM'",
 			Aliases: []string{"m"},
 		},
 		&cli.StringFlag{

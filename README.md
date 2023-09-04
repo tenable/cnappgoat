@@ -135,7 +135,7 @@ cnappgoat provision <scenario-1> <scenario-2> <scenario-N>
 
 #### Flags:
 
-- `--module` - Filters scenarios by module (e.g. CSPM, CIEM, CWPP, DSPM, etc.)
+- `--module` - Filters scenarios by module (e.g. CSPM, CIEM, CWPP, DSPM, KSPM etc.)
 - `--platform` - Filters scenarios by platform (e.g. AWS, Azure, GCP)
 - `--force` - Enables force mode (unlock locked stacks with pulumi cancel)
 - `--debug` - Enables debug logging.
