@@ -295,7 +295,7 @@ func (l *LocalStorage) createScenario(path string) (*Scenario, error) {
 		return nil, fmt.Errorf("failed to parse Pulumi.yaml: %w", err)
 	}
 	if err = scenario.ScenarioParams.IsValid(); err != nil {
-		return nil, fmt.Errorf("scenarioParams field is empty for scenario %v", scenario.Name)
+		return nil, fmt.Errorf("scenarioParams field is invalid for scenario %v: %w", scenario.Name, err)
 	}
 
 	scenario.SrcDir = filepath.Dir(path)
@@ -346,9 +346,9 @@ func (l *LocalStorage) loadScenarios(path string) (map[string]*Scenario, error) 
 		if !info.IsDir() && info.Name() == "Pulumi.yaml" {
 			scenario, err := l.createScenario(path)
 			if err != nil {
-				return fmt.Errorf("error loading scenarios, unable to create scenario: %w", err)
+				logrus.Errorf("error loading scenarios, unable to create scenario: %v", err)
+				return nil // because we'd still like to carry on and load the other scenarios
 			}
-
 			scenarios[scenario.ScenarioParams.ID] = scenario
 		}
 
