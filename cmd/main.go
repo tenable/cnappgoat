@@ -23,8 +23,9 @@ var (
 
 func init() {
 	logrus.SetFormatter(&logrus.TextFormatter{
-		DisableQuote: true,
-		ForceColors:  true,
+		DisableQuote:  true,
+		ForceColors:   true,
+		FullTimestamp: true,
 	})
 }
 
