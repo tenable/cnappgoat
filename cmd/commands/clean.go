@@ -17,7 +17,7 @@ var CleanCommand = &cli.Command{
 		moduleTable := c.Context.Value("CNAPPgoatModuleTable").(table.Writer)
 		engine := c.Context.Value("CNAPPgoatEngine").(*cnappgoat.Engine)
 		reg := c.Context.Value("CNAPPgoatModuleRegistry").(*cnappgoat.Registry)
-		if c.Args().Len() == 0 {
+		if c.Args().Len() == 0 && c.String("module") == "" && c.String("platform") == "" && c.String("state") == "" {
 			if err := engine.CleanAll(c.Context, c.Bool("force")); err != nil {
 				return err
 			}
